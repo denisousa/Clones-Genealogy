@@ -16,3 +16,5 @@ target
 *.iml
 *.swp
 datanucleus.log
+
+./workspace/dataset
