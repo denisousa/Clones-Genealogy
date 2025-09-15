@@ -1,6 +1,7 @@
-./results
-./workspace/repo
-./workspace/githistory.txt
+results
+workspace/repo
+workspace/githistory.txt
+workspace/dataset
 
 target
 .metadata
@@ -17,7 +18,6 @@ target
 *.swp
 datanucleus.log
 
-./workspace/dataset
 
 ./results/production_results.xml
 ./results/production_density.csv
