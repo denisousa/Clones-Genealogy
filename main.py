@@ -6,7 +6,7 @@ from xml.etree import ElementTree as ET
 
 
 # Project settings
-GIT_URL = "https://github.com/apache/thrift.git" # The URL of the git repository to clone.
+GIT_URL = "https://github.com/libgdx/libgdx" # The URL of the git repository to clone.
 COMMIT_INTERVAL = 10       # How often a commit should be analysed (put 1 for every commit)
 MAX_COMMITS = 10           # Maximum number of commits to analyse
 USE_ICLONES = False         # Also use iClones to detect clones
