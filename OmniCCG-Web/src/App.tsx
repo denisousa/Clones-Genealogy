@@ -8,6 +8,7 @@ import Configure from "./pages/Configure";
 import Visualize from "./pages/Visualize";
 import Metrics from "./pages/Metrics";
 import NotFound from "./pages/NotFound";
+import Repos from "./pages/Repos";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/myrepos" element={<Repos />} />
           <Route path="/" element={<Home />} />
           <Route path="/configure" element={<Configure />} />
           <Route path="/visualize" element={<Visualize />} />

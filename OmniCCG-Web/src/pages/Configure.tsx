@@ -220,7 +220,7 @@ const Configure = () => {
         <header className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/myrepos")}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

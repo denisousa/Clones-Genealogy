@@ -12,6 +12,9 @@ flask = "^3.1.2"
 requests = "^2.32.5"
 gitpython = "^3.1.45"
 flask-cors = "^6.0.1"
+python-dotenv = "^1.2.2"
+authlib = "^1.7.2"
+GitHub-Flask = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

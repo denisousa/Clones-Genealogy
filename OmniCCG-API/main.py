@@ -1,18 +1,108 @@
 from flask_cors import CORS
 from core import execute_omniccg
 import subprocess
-from flask import Flask, Response, request, jsonify
+from flask import Flask, Response, request, jsonify, url_for, session, redirect
+from authlib.integrations.flask_client import OAuth
+from flask_github import GitHub
 from get_code_snippets import _ensure_repo, _checkout, _safe_repo_path, _slice_lines, _read_text_with_fallback, _clean_git_locks
 from pathlib import Path
 from control import git_repos_to_control
+import os
 
 app = Flask(__name__)
-CORS(app)   
+frontend_origin = os.getenv('FRONTEND_URL', 'http://localhost:8080')
+CORS(
+    app,
+    resources={r"/*": {"origins": frontend_origin}},
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+)
+app.secret_key = os.getenv('SECRET_KEY')
+
+oauth = OAuth(app)
+
+github = oauth.register(
+    name='github',
+    client_id=os.getenv('GITHUB_CLIENT_ID'),
+    client_secret=os.getenv('GITHUB_CLIENT_SECRET'),
+    access_token_url='https://github.com/login/oauth/access_token',
+    authorize_url='https://github.com/login/oauth/authorize',
+    api_base_url='https://api.github.com/',
+    client_kwargs={'scope': 'read:user repo'},
+)
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+@app.route('/login/github', methods=['OPTIONS'])
+def login_options():
+    return '', 204
+
+@app.get("/login/github")
+def login():
+    redirect_uri = url_for(
+        'authorized',
+        _external=True
+    )
+
+    return github.authorize_redirect(
+        redirect_uri
+    )
+
+@app.get("/login/github/authorized")
+def authorized():
+    token = github.authorize_access_token()
+
+    user = github.get(
+        'user',
+        token=token
+    ).json()
+
+    print(f"User {user['login']} authenticated successfully.")
+
+    session['github_token'] = token
+
+    frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:8080')
+    return redirect(f"{frontend_url}/myrepos")
+
+@app.get('/logout')
+def logout():
+    session.pop('github_token', None)
+    session.clear()
+    return jsonify({
+        'message': 'Logged out successfully.'
+    }), 200
+
+@app.route('/api/repos', methods=['OPTIONS'])
+def repos_options():
+    return '', 204
+
+@app.get('/api/repos')
+def repos():
+    token = request.headers.get('Authorization', '').replace('Bearer ', '').strip()
+
+    if not token:
+        token = session.get('github_token')
+
+    if not token:
+        return jsonify({
+            'error': 'Missing GitHub access token. Log in via /login/github first or provide a Bearer token.'
+        }), 401
+
+    if isinstance(token, dict):
+        token = token.get('access_token') or token.get('token')
+
+    resp = github.get(
+        'user/repos',
+        token={
+            'access_token': token,
+            'token_type': 'bearer'
+        }
+    )
+
+    return jsonify(resp.json())
 
 @app.post("/detect_clones")
 def detect_clones():

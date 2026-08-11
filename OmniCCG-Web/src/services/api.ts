@@ -8,6 +8,7 @@ import type {
   Lineage,
   LineageNode,
   CloneSource,
+  Repo,
 } from "@/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
@@ -242,4 +243,32 @@ export const api = {
     }
     return res.text(); // Retorna XML como texto
   },
+
+  async fetchUserRepos(): Promise<Repo[]> {
+    const res = await fetch(`${API_BASE_URL}/api/repos`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to fetch repositories: ${res.status}`);
+    }
+
+    const githubRepos = (await res.json()) as Repo[];
+
+    return githubRepos.map((repo) => ({
+      id: repo.id,
+      name: repo.name,
+      description: repo.description ?? "No description available",
+      clone_url: repo.clone_url,
+      updated_at: repo.updated_at,
+      language: repo.language ?? "Unknown",
+      lastAnalysis: undefined,
+    }));
+    
+  },
+
+  async login(): Promise<void> {
+    window.location.assign(`${API_BASE_URL}/login/github`);
+  }
 };

@@ -32,3 +32,5 @@ datanucleus.log
 
 ./results/production_results.xml
 ./results/production_density.csv
+
+.env

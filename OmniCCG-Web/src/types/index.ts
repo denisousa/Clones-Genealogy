@@ -139,3 +139,13 @@ export interface AnalysisResult {
   metrics: MetricsData;
   genealogy: GenealogyData;
 }
+
+export interface Repo {
+  id: number;
+  name: string;
+  clone_url: string;
+  description: string;
+  updated_at: string;
+  language?: string;
+  lastAnalysis?: string;
+}
